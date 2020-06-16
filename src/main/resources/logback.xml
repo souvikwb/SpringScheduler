@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE logback>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+	<!-- Appenders -->
+	<appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} LEVEL=%-5p TXNID=%X{TXNID} THREAD_ID=%t %m%n</pattern>
+		</layout>
+	</appender>
+
+	<appender name="rollingLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${yourfilename.logs}/${appName}_${port.http.nonssl}.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${yourfilename.logs}/${appName}.${port.http.nonssl}.%i.log.gz</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>5</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>10MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS} LEVEL=%-5p TXNID=%X{TXNID} THREAD_ID=%t %m%n</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="rollingLogAsync" class="ch.qos.logback.classic.AsyncAppender">
+		<queueSize>500</queueSize>\
+		<discardingThreshold>0</discardingThreshold>
+		<appender-ref ref="rollingLog"/>
+	</appender>
+
+	<!-- 3rdparty Loggers -->
+	<logger name="org.springframework" level="ERROR" />
+	<logger name="httpclient" level="WARN" />
+
+	<root level="INFO">
+		<appender-ref ref="rollingLogAsync" />
+	</root>
+
+</configuration>
